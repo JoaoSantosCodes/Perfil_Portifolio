@@ -1,33 +1,21 @@
 # Script para atualizar o GitHub automaticamente
 Write-Host "🚀 Iniciando atualização do GitHub..." -ForegroundColor Green
 
-# Função para verificar se o comando git está disponível
-function Test-GitCommand {
-    try {
-        $null = git --version
-        return $true
-    }
-    catch {
-        Write-Host "❌ Git não está instalado ou não está no PATH" -ForegroundColor Red
-        return $false
-    }
+# Verificar se o git está instalado
+try {
+    $null = git --version
+} catch {
+    Write-Host "❌ Git não está instalado ou não está no PATH" -ForegroundColor Red
+    exit 1
 }
 
-# Função para verificar se o repositório está configurado
-function Test-GitRepository {
-    try {
-        $null = git rev-parse --is-inside-work-tree
-        return $true
-    }
-    catch {
-        Write-Host "❌ Diretório atual não é um repositório Git" -ForegroundColor Red
-        return $false
-    }
+# Verificar se está em um repositório git
+try {
+    $null = git rev-parse --is-inside-work-tree
+} catch {
+    Write-Host "❌ Diretório atual não é um repositório Git" -ForegroundColor Red
+    exit 1
 }
-
-# Verificar pré-requisitos
-if (-not (Test-GitCommand)) { exit 1 }
-if (-not (Test-GitRepository)) { exit 1 }
 
 # Verificar se há mudanças
 $status = git status --porcelain
@@ -58,4 +46,4 @@ if ($status) {
 }
 
 Write-Host "`nPressione qualquer tecla para sair..."
-$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") 
+$Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") | Out-Null 
